@@ -1,5 +1,22 @@
 import EndpointsToddlersSettings._
-import sbt.{ uri, Project, ProjectRef }
+
+inThisBuild(
+  List(
+    organization := "io.github.jkobejs",
+    homepage := Some(url("https://github.com/jkobejs/endpoints-uzhttp")),
+    organizationName := "Josip Grgurica",
+    startYear := Some(2020),
+    licenses := List("MIT License" -> url("http://opensource.org/licenses/mit-license.php")),
+    developers := List(
+      Developer(
+        "jkobejs",
+        "Josip Grgurica",
+        "josip.grgurica@gmail.com",
+        url("https://github.com/jkobejs")
+      )
+    )
+  )
+)
 
 val examples =
   project.in(file("examples")).settings(noPublishSettings)
@@ -21,6 +38,20 @@ lazy val `uzhttp-server` =
         "com.lihaoyi"       %% "ujson"             % ujsonVersion % Test
       )
     )
+
+lazy val documentation = project
+  .in(file("documentation"))
+  .settings(
+    `scala 2.12 to latest`,
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
+      `uzhttp-server`
+    ),
+    siteSubdirName in ScalaUnidoc := "latest/api",
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
+    git.remoteRepo := "git@github.com:jkobejs/endpoints-uzhttp.git"
+  )
+  .enablePlugins(ScalaUnidocPlugin)
+  .enablePlugins(GhpagesPlugin)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 

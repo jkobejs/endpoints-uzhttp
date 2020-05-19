@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import endpoints.uzhttp.server._
 import uzhttp.server.Server
-import zio.ZIO
+import zio.{ App, ZIO }
 
 case class Counter(value: Int)
 
@@ -34,7 +34,6 @@ trait CounterEndpoints
   implicit lazy val jsonSchemaCounter: JsonSchema[Counter] = genericJsonSchema
   implicit lazy val jsonSchemaOperation: JsonSchema[Operation] =
     genericJsonSchema
-
 }
 
 import endpoints.openapi
@@ -94,18 +93,12 @@ object DocumentationServer extends Endpoints with JsonEntitiesFromEncodersAndDec
 
   val assets = assetsEndpoint(path / "assets" / assetSegments())
 
-  // Redirect the root URL “/” to the “index.html” asset for convenience
-//    val root = endpoint(get(path), redirect(assets)(asset("index.html")))
-
   val handlers = documentation.interpretPure(_ => CounterDocumentation.api) orElse
     assets.interpretPure(assetResources(pathPrefix = Some("public")))
-//      root
 
   override def digests: Map[String, String] = Map.empty
 }
 
-import zio.{ App, ZIO }
-//#main-only
 object Main extends App {
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
     Server

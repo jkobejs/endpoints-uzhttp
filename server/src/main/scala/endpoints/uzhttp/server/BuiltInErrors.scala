@@ -9,5 +9,5 @@ trait BuiltInErrors extends algebra.BuiltInErrors {
     error => (endpoints.ujson.codecs.invalidCodec.encode(error).getBytes(), "application/json")
 
   override def serverErrorResponseEntity: ServerError => (Array[Byte], String) =
-    error => clientErrorsResponseEntity(Invalid(error.getMessage()))
+    error => clientErrorsResponseEntity(Invalid(error.getMessage))
 }

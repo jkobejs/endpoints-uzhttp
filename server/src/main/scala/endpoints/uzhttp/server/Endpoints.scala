@@ -24,11 +24,16 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
                     case PathResponse(path, request, contentType, status, headers) =>
                       UzResponse
                         .fromPath(path, request, contentType, status, headers)
-                        .mapError {
-                          case httpError: HTTPError => httpError
-                          case throwable =>
-                            HTTPError.InternalServerError(throwable.getMessage, Some(throwable))
+                        .either
+                        .map {
+                          case Right(response) => Right(response)
+                          case Left(error) =>
+                            error match {
+                              case e: HTTPError.NotFound => Left(e)
+                              case e                     => Right(handleServerError(e))
+                            }
                         }
+                        .absolve
                     case ResourceResponse(name, request, contentType, status, headers) =>
                       UzResponse
                         .fromResource(
@@ -38,16 +43,21 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
                           status = status,
                           headers = headers
                         )
-                        .mapError {
-                          case httpError: HTTPError => httpError
-                          case throwable =>
-                            HTTPError.InternalServerError(throwable.getMessage, Some(throwable))
+                        .either
+                        .map {
+                          case Right(response) => Right(response)
+                          case Left(error) =>
+                            error match {
+                              case e: HTTPError.NotFound => Left(e)
+                              case e                     => Right(handleServerError(e))
+                            }
                         }
+                        .absolve
                   }
                 )
 
             case invalid: Invalid =>
-              ZIO.fail(HTTPError.BadRequest(invalid.errors.mkString(", ")))
+              ZIO.succeed(handleClientErrors(invalid))
           })
         }
 
@@ -62,4 +72,36 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
 
   def endpoint[A, B](request: Request[A], response: Response[B], docs: EndpointDocs): Endpoint[A, B] =
     Endpoint(request, response)
+
+  /**
+   * This method is called by ''endpoints'' when decoding a request failed.
+   *
+   * The provided implementation calls `clientErrorsResponse` to construct
+   * a response containing the errors.
+   *
+   * This method can be overridden to customize the error reporting logic.
+   */
+  def handleClientErrors(invalid: Invalid): UzResponse =
+    clientErrorsResponse(invalidToClientErrors(invalid)) match {
+      case ConstResponse(response) => response
+      case _ =>
+        UzResponse.const(Array.empty, InternalServerError)
+    }
+
+  /**
+   * This method is called by ''endpoints'' when an exception is thrown during
+   * request processing.
+   *
+   * The provided implementation calls [[serverErrorResponse]] to construct
+   * a response containing the error message.
+   *
+   * This method can be overridden to customize the error reporting logic.
+   */
+  def handleServerError(throwable: Throwable): UzResponse =
+    serverErrorResponse(throwableToServerError(throwable)) match {
+      case ConstResponse(response) =>
+        response
+      case _ =>
+        UzResponse.const(Array.empty, InternalServerError)
+    }
 }

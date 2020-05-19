@@ -49,7 +49,6 @@ trait BasicAuthentication extends Endpoints with algebra.BasicAuthentication {
   ): Request[Out] =
     extractUrlAndHeaders(method, url, headers ++ basicAuthenticationHeader) {
       case (_, (_, None)) =>
-        // TODO: Improve
         _ => UIO(Invalid("Credentials are missing"))
       case (u, (h, Some(credentials))) =>
         uzRequest =>

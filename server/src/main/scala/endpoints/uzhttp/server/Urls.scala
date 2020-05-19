@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import endpoints._
 import endpoints.algebra.Documentation
 
-import scala.collection.compat.Factory
+import scala.collection.compat._
 import scala.collection.mutable
 
 trait Urls extends algebra.Urls {
