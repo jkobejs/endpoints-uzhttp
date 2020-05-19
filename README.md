@@ -15,7 +15,7 @@ The `Endpoints` interpreter interprets endpoint definitions into partial functio
 ```scala
 PartialFunction[UzRequest, ZIO[R with Blocking, HTTPError, UzResponse]]
 ```
-which can easily be chained used `.orElse` method. Chain methods can be used to handle incoming requests using `uzhttp.server.Server.handleSome` method.
+which can easily be chained used `.orElse` method. Chained methods can be used to handle incoming requests using `uzhttp.server.Server.handleSome` method.
 
 
 
