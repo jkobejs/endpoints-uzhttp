@@ -15,7 +15,10 @@ lazy val apiDoc = project
     paradoxProperties ++= Map(
       "version"           -> version.value,
       "scaladoc.base_url" -> s".../latest/api"
-    )
+    ),
+    Compile / paradoxMaterialTheme ~= {
+      _.withRepository(uri("https://github.com/jkobejs/endpoints-uzhttp"))
+    }
   )
   .enablePlugins(ScalaUnidocPlugin)
   .enablePlugins(GhpagesPlugin)
