@@ -1,16 +1,16 @@
 name: Release
-  on:
-    push:
-      tags:
-        - 'v*'
-  jobs:
-    build:
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          scala: [2.12.10, 2.13.1]
-      steps:
-        - uses: actions/checkout@v1
-        - uses: olafurpg/setup-scala@v5
-        - name: Release
-          run:  sbt ++${{matrix.scala}} ci-release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        scala: [2.12.10, 2.13.1]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v5
+      - name: Release
+        run:  sbt ++${{matrix.scala}} ci-release
