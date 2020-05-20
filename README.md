@@ -11,7 +11,7 @@ See the [documentation](https://jkobejs.github.io/endpoints-uzhttp) to learn mor
 ~~~
 $ sbt
 > ++2.12.8
-> <example>/reStart
+> <example>/run
 ~~~
 
 Where `<example>` can be either

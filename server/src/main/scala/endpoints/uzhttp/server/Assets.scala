@@ -79,16 +79,19 @@ trait Assets extends algebra.Assets with Endpoints {
     }
 }
 
+/**
+ * Strategy that can be used for adding caching related response headers.
+ */
 sealed trait CacheStrategy
 object CacheStrategy {
 
   /**
-   * Cache non html assets
+   * Cache all non html assets.
    */
   object Default extends CacheStrategy
 
   /**
-   * Custom strategy that uses decider to see which cache control headers are used for given media type
+   * Custom strategy that uses decider to determine which cache control headers will be used for given media type.
    */
   case class Custom(decider: MediaType => List[(String, String)]) extends CacheStrategy
 }
