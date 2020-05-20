@@ -15,7 +15,7 @@ $ sbt
 ~~~
 
 Where `<example>` can be either
-[`example-basic-uzhttp-server`](documentation/examples/basic/example-basic-uzhttp-server) or
+[`example-basic-uzhttp-server`](documentation/examples/basic/uzhttp-server) or
 [`example-documented`](documentation/examples/documented).
 
 And then browse http://localhost:8080. If you are running `example-documented` you can access swagger UI at http://localhost:8080/assets/index.html.
