@@ -1,4 +1,4 @@
-import EndpointsToddlersSettings._
+import EndpointsUzhttpSettings._
 
 inThisBuild(
   List(
@@ -18,9 +18,6 @@ inThisBuild(
   )
 )
 
-val examples =
-  project.in(file("examples")).settings(noPublishSettings)
-
 lazy val `uzhttp-server` =
   project
     .in(file("server"))
@@ -39,19 +36,7 @@ lazy val `uzhttp-server` =
       )
     )
 
-lazy val documentation = project
-  .in(file("documentation"))
-  .settings(
-    `scala 2.12 to latest`,
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
-      `uzhttp-server`
-    ),
-    siteSubdirName in ScalaUnidoc := "latest/api",
-    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
-    git.remoteRepo := "git@github.com:jkobejs/endpoints-uzhttp.git"
-  )
-  .enablePlugins(ScalaUnidocPlugin)
-  .enablePlugins(GhpagesPlugin)
+lazy val documentation = project.in(file("documentation")).settings(noPublishSettings)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
