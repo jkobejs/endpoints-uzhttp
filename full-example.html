@@ -123,7 +123,14 @@ endpoints-uzhttp
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L10-L114" target="_blank" title="Go to snippet source"></a><code class="language-scala"><br/>case class Counter(value: Int)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L4-L114" target="_blank" title="Go to snippet source"></a><code class="language-scala">import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicInteger
+
+import endpoints.uzhttp.server._
+import uzhttp.server.Server
+import zio.{ App, ZIO }
+
+case class Counter(value: Int)
 
 sealed trait Operation
 object Operation {
