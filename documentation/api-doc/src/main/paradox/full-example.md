@@ -1,2 +1,26 @@
+full-example
+=========
 
-@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #endpoint-definition }
+Let's start with defining our domain model.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #domain-model }
+
+After we have our domain defined let's describe HTTP API that we will use.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #endpoint-description }
+
+We want to show our HTTP API documentation in Swagger UI so let's define OpenAPI documentation.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #endpoint-documentation }
+
+If we want to bring out HTTP API descriptions to life we need to interpret them, so lets do that.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #endpoint-implementation }
+
+We also need to interpret documentation endpoints, we will do that by using `uzhttp` implementation of `Assets` algebra.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #documentation-implementation }
+
+All that is left is to serve our HTTP API is to run uzhttp server, so let's to that.
+
+@@snip [Counter.scala](/documentation/examples/documented/src/main/scala/counter/Counter.scala) { #main }

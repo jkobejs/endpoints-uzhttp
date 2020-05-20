@@ -31,7 +31,7 @@ object EndpointsUzhttpSettings {
 
   val `scala 2.12 to latest` = Seq(
     scalaVersion := "2.13.1",
-    crossScalaVersions := Seq("2.13.1")
+    crossScalaVersions := Seq("2.13.1", "2.12.10")
   )
 
   val noPublishSettings = commonSettings ++ Seq(
