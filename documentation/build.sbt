@@ -13,15 +13,14 @@ lazy val apiDoc = project
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
     git.remoteRepo := "git@github.com:jkobejs/endpoints-uzhttp.git",
     paradoxProperties ++= Map(
-      "version" -> version.value,
-      "scaladoc.base_url" -> s".../latest/api",
-    ),
+      "version"           -> version.value,
+      "scaladoc.base_url" -> s".../latest/api"
+    )
   )
   .enablePlugins(ScalaUnidocPlugin)
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(ParadoxSitePlugin)
   .enablePlugins(ParadoxMaterialThemePlugin)
-
 
 val `example-documented` =
   project

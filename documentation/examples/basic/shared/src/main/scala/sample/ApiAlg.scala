@@ -4,10 +4,7 @@ import endpoints.algebra.BasicAuthentication.Credentials
 import endpoints.algebra._
 import io.circe.generic.JsonCodec
 
-trait ApiAlg
-    extends Endpoints
-    with circe.JsonEntitiesFromCodecs
-    with BasicAuthentication {
+trait ApiAlg extends Endpoints with circe.JsonEntitiesFromCodecs with BasicAuthentication {
 
   val index: Endpoint[(String, Int, String), User] =
     endpoint(

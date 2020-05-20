@@ -3,7 +3,7 @@ package sample
 import java.net.InetSocketAddress
 
 import uzhttp.server.Server
-import zio.{App, ZIO}
+import zio.{ App, ZIO }
 
 object Main extends App {
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
