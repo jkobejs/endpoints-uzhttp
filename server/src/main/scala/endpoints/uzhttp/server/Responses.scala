@@ -14,8 +14,8 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
     path: Path,
     request: UzRequest,
     contentType: String,
-    status: StatusCode,
-    headers: List[(String, String)]
+    status: Status = Status.Ok,
+    headers: List[(String, String)] = Nil
   ) extends HttpResponse
   final case class ResourceResponse(
     name: String,
