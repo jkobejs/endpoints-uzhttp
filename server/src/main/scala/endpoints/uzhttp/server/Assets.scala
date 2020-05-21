@@ -1,5 +1,7 @@
 package endpoints.uzhttp.server
 
+import java.nio.file.Paths
+
 import endpoints.algebra.Documentation
 import endpoints.{ algebra, Valid }
 import uzhttp.{ Request => UzRequest }
@@ -36,9 +38,18 @@ trait Assets extends algebra.Assets with Endpoints {
     endpoint(req, identity[AssetResponse])
   }
 
+  /**
+   * @param pathPrefix Prefix to use to look up the resources in the classpath. You
+   *                   most probably never want to publish all your classpath resources.
+   * @param cacheStrategy Strategy to use for constructing cache related response headers
+   * @param serveFromFilesystem Flag that determines if assets will be read from filesystem or classpath resources
+   * @return A function that, given an [[AssetRequest]], builds an [[AssetResponse]] by
+   *         looking for the requested asset in the classpath resources or anywhere on filesystem.
+   */
   def assetResources(
     pathPrefix: Option[String] = None,
-    cacheStrategy: CacheStrategy = CacheStrategy.Default
+    cacheStrategy: CacheStrategy = CacheStrategy.Default,
+    serveFromFilesystem: Boolean = false
   ): AssetRequest => AssetResponse = assetRequest => {
     val assetInfo = assetRequest.assetPath
     val path =
@@ -60,12 +71,21 @@ trait Assets extends algebra.Assets with Endpoints {
           decider(contentType.mediaType)
       }
 
-    ResourceResponse(
-      resourcePath,
-      assetRequest.request,
-      contentType = contentType.toString,
-      headers = headers
-    )
+    if (serveFromFilesystem)
+      PathResponse(
+        Paths.get(resourcePath),
+        assetRequest.request,
+        contentType = contentType.toString,
+        headers = headers
+      )
+    else
+      ResourceResponse(
+        resourcePath,
+        assetRequest.request,
+        contentType = contentType.toString,
+        headers = headers
+      )
+
   }
 
   private def nameToContentType(name: String): `Content-Type` =
