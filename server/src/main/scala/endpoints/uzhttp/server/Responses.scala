@@ -10,14 +10,14 @@ import endpoints.algebra.Documentation
 trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
 
   sealed trait HttpResponse
-  case class PathResponse(
+  final case class PathResponse(
     path: Path,
     request: UzRequest,
     contentType: String,
     status: StatusCode,
     headers: List[(String, String)]
   ) extends HttpResponse
-  case class ResourceResponse(
+  final case class ResourceResponse(
     name: String,
     request: UzRequest,
     contentType: String,
@@ -25,8 +25,20 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
     headers: List[(String, String)] = Nil
   ) extends HttpResponse
 
-  case class ConstResponse(response: UzResponse) extends HttpResponse
+  final case class IdResponse(response: UzResponse) extends HttpResponse
 
+  /** An HTTP response (status, headers, and entity) carrying an information of type A
+   *
+   * It is modeled as function that receives `A` and return [[HttpResponse]].
+   * [[HttpResponse]] is sealed trait that has 3 subtypes:
+   *  - [[PathResponse]] - it should be used for returning assets form path on server
+   *  - [[ResourceResponse]] - it should be used for returning assets from resources
+   *  - [[IdResponse]] - it should be used for returning regular responses
+   *
+   * @note This type has implicit methods provided by the [[InvariantFunctorSyntax]]
+   *       and [[ResponseSyntax]] class
+   * @group types
+   */
   type Response[A] = A => HttpResponse
 
   implicit lazy val responseInvariantFunctor: endpoints.InvariantFunctor[Response] =
@@ -39,13 +51,12 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
         fa compose g
     }
 
-  // Return content lenght with type
-  case class Entity(
-    data: Array[Byte],
-    contentType: Option[String],
-    contentLength: Option[Long]
-  )
-
+  /** An HTTP response entity carrying an information of type A
+   * It is modeled as function that receives `A` and returns it value
+   * serialized to byte array together with content type.
+   *
+   * @group types
+   */
   type ResponseEntity[A] = A => (Array[Byte], String)
 
   implicit lazy val responseEntityInvariantFunctor: InvariantFunctor[ResponseEntity] =
@@ -66,6 +77,16 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
       (string.getBytes(StandardCharsets.UTF_8), s"text/plain; charset=${StandardCharsets.UTF_8.name()}")
     }
 
+  /**
+   * Information carried by responses’ headers.
+   *
+   * You can construct values of type `ResponseHeaders` by using the operations [[responseHeader]],
+   * [[optResponseHeader]], or [[emptyResponseHeaders]].
+   *
+   * @note This type has implicit methods provided by the [[SemigroupalSyntax]]
+   *       and [[PartialInvariantFunctorSyntax]] classes.
+   * @group types
+   */
   type ResponseHeaders[A] = A => List[(String, String)]
 
   implicit lazy val responseHeadersSemigroupal: Semigroupal[ResponseHeaders] =
@@ -93,12 +114,43 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
   def emptyResponseHeaders: ResponseHeaders[Unit] =
     _ => Nil
 
+  /**
+   * Response headers containing a header with the given `name`.
+   * Client interpreters should model the header value as `String`, or
+   * fail if the response header is missing.
+   * Server interpreters should produce such a response header.
+   * Documentation interpreters should document this header.
+   *
+   * Example:
+   *
+   * {{{
+   *   val versionedResource: Endpoint[Unit, (SomeResource, String)] =
+   *     endpoint(
+   *       get(path / "versioned-resource"),
+   *       ok(
+   *         jsonResponse[SomeResource],
+   *         headers = responseHeader("ETag")
+   *       )
+   *     )
+   * }}}
+   *
+   * @group operations
+   */
   def responseHeader(
     name: String,
     docs: Documentation = None
   ): ResponseHeaders[String] =
     value => List((name, value))
 
+  /**
+   * Response headers optionally containing a header with the given `name`.
+   * Client interpreters should model the header value as `Some[String]`, or
+   * `None` if the response header is missing.
+   * Server interpreters should produce such a response header.
+   * Documentation interpreters should document this header.
+   *
+   * @group operations
+   */
   def optResponseHeader(
     name: String,
     docs: Documentation = None
@@ -107,6 +159,16 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
     case None        => emptyResponseHeaders(())
   }
 
+  /**
+   * Server interpreters construct a response with the given status and entity.
+   * Client interpreters accept a response only if it has a corresponding status code.
+   *
+   * @param statusCode Response status code
+   * @param entity     Response entity
+   * @param docs       Response documentation
+   * @param headers    Response headers
+   * @group operations
+   */
   override def response[A, B, R](
     statusCode: StatusCode,
     entity: ResponseEntity[A],
@@ -116,7 +178,7 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
     r => {
       val (a, b)              = tupler.unapply(r)
       val (body, contentType) = entity(a)
-      ConstResponse(
+      IdResponse(
         UzResponse.const(
           body = body,
           status = statusCode,
