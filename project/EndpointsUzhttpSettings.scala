@@ -45,7 +45,7 @@ object EndpointsUzhttpSettings {
   val endpointsVersion = "0.15.0+46-37dde73f"
   val akkaHttpVersion  = "10.1.11"
   val akkaActorVersion = "2.6.3"
-  val scalaTestVersion = "3.1.1"
+  val scalaTestVersion = "3.1.2"
   val uzhttpVersion    = "0.2.0"
   val ujsonVersion     = "1.0.0"
 
