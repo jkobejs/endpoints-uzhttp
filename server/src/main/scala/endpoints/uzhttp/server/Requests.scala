@@ -57,9 +57,13 @@ trait Requests extends endpoints.algebra.Requests with Methods with Urls {
         headers => f(headers).flatMap(map)
     }
 
-  // TODO: Explain why Option[UIO[Validated[A]]
   /**
    * An HTTP request.
+   *
+   * It receives uzhttp.Request and returns:
+   * - `None` if request url cannot be matched
+   * - Some(Valid(a)) if `A` can be extracted from request
+   * - Invalid if `A` cannot be extracted from request
    *
    * Has an instance of `InvariantFunctor`.
    */
