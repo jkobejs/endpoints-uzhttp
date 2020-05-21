@@ -20,7 +20,7 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
                 .mapError(throwable => HTTPError.InternalServerError(throwable.getMessage, Some(throwable)))
                 .flatMap(b =>
                   response(b) match {
-                    case ConstResponse(uzResponse: UzResponse) => ZIO.succeed(uzResponse)
+                    case IdResponse(uzResponse: UzResponse) => ZIO.succeed(uzResponse)
                     case PathResponse(path, request, contentType, status, headers) =>
                       UzResponse
                         .fromPath(path, request, contentType, status, headers)
@@ -83,7 +83,7 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
    */
   def handleClientErrors(invalid: Invalid): UzResponse =
     clientErrorsResponse(invalidToClientErrors(invalid)) match {
-      case ConstResponse(response) => response
+      case IdResponse(response) => response
       case _ =>
         UzResponse.const(Array.empty, InternalServerError)
     }
@@ -99,7 +99,7 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
    */
   def handleServerError(throwable: Throwable): UzResponse =
     serverErrorResponse(throwableToServerError(throwable)) match {
-      case ConstResponse(response) =>
+      case IdResponse(response) =>
         response
       case _ =>
         UzResponse.const(Array.empty, InternalServerError)
