@@ -11,8 +11,11 @@ jobs:
       matrix:
         scala: [2.12.10, 2.13.1]
     steps:
-      - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v5
+      - uses: actions/checkout@v2
+      - run: git fetch --prune --unshallow
+      - uses: olafurpg/setup-scala@v7
+        with:
+          java-version: adopt@1.8
       - name: Format Check
         if: matrix.scala == '2.13.1'
         run: sbt ++${{matrix.scala}} fmtCheck
