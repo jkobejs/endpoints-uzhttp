@@ -5,6 +5,7 @@ val `uzhttp-server` = LocalProject("uzhttp-server")
 lazy val apiDoc = project
   .in(file("api-doc"))
   .settings(
+    noPublishSettings,
     `scala 2.12 to latest`,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(
       `uzhttp-server`
@@ -58,6 +59,7 @@ val `example-basic-uzhttp-server` =
   project
     .in(file("examples/basic/uzhttp-server"))
     .settings(
+      noPublishSettings,
       commonSettings,
       `scala 2.12 to latest`,
       publishArtifact := false
