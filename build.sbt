@@ -40,5 +40,7 @@ lazy val documentation = project.in(file("documentation")).settings(noPublishSet
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+noPublishSettings
+
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("fmtCheck", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
