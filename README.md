@@ -9,8 +9,8 @@ See the [documentation](https://jkobejs.github.io/endpoints-uzhttp) to learn mor
 ## Running the Examples
 
 ~~~
-$ sbt
-> ++2.12.8
+$ ./sbt
+> ++2.13.1
 > <example>/run
 ~~~
 
