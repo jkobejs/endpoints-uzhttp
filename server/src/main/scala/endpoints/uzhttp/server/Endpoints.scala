@@ -3,7 +3,7 @@ package endpoints.uzhttp.server
 import _root_.uzhttp.{ HTTPError, Request => UzRequest, Response => UzResponse }
 import endpoints.{ algebra, Invalid, Valid }
 import zio.blocking.Blocking
-import zio.{ IO, RIO, Task, ZIO }
+import zio.{ RIO, Task, ZIO }
 
 trait Endpoints extends algebra.Endpoints with EndpointsWithCustomErrors with BuiltInErrors {}
 

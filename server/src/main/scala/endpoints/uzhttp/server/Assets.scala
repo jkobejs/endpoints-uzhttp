@@ -3,10 +3,10 @@ package endpoints.uzhttp.server
 import java.nio.file.Paths
 
 import endpoints.algebra.Documentation
-import endpoints.{Valid, algebra}
-import uzhttp.{Request => UzRequest, Response => UzResponse}
+import endpoints.{ algebra, Valid }
+import uzhttp.{ Request => UzRequest, Response => UzResponse }
 import zio.blocking.Blocking
-import zio.{RIO, Task, UIO}
+import zio.{ RIO, UIO }
 
 trait Assets extends algebra.Assets with Endpoints {
 
