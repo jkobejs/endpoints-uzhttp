@@ -3,61 +3,49 @@ package endpoints.uzhttp.server
 import _root_.uzhttp.{ HTTPError, Request => UzRequest, Response => UzResponse }
 import endpoints.{ algebra, Invalid, Valid }
 import zio.blocking.Blocking
-import zio.{ Task, ZIO }
+import zio.{ RIO, Task, ZIO }
 
 trait Endpoints extends algebra.Endpoints with EndpointsWithCustomErrors with BuiltInErrors {}
 
 trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with Requests with Responses {
   case class Endpoint[A, B](request: Request[A], response: Response[B]) {
+
+    /**
+     * Interprets endpoint into partial function that receives [[uzhttp.Request]] and returns
+     * effect that contains [[uzhttp.Response]], can fail with [[uzhttp.HTTPError]] and requires
+     * custom environment `R` together with [[Blocking]].
+     *
+     * Effect cannot require only `R` because for interpreting asset endpoints we need to make calls
+     * to file system which requires blocking thread pool.
+     *
+     * @param implementation endpoint implementation
+     * @tparam R environment that returning effect requires
+     * @return partial function that models request, response flow
+     */
     def interpret[R](
-      implementation: A => ZIO[R with Blocking, Throwable, B]
+      implementation: A => RIO[R, B]
     ): PartialFunction[UzRequest, ZIO[R with Blocking, HTTPError, UzResponse]] = {
       val handler: UzRequest => Option[ZIO[R with Blocking, HTTPError, UzResponse]] =
         (uzRequest: UzRequest) => {
           request(uzRequest).map(_.flatMap {
             case Valid(a) =>
-              implementation(a)
-                .mapError(throwable => HTTPError.InternalServerError(throwable.getMessage, Some(throwable)))
-                .flatMap(b =>
-                  response(b) match {
-                    case IdResponse(uzResponse: UzResponse) => ZIO.succeed(uzResponse)
-                    case PathResponse(path, request, contentType, status, headers) =>
-                      UzResponse
-                        .fromPath(path, request, contentType, status, headers)
-                        .either
-                        .map {
-                          case Right(response) => Right(response)
-                          case Left(error) =>
-                            error match {
-                              case e: HTTPError.NotFound => Left(e)
-                              case e                     => Right(handleServerError(e))
-                            }
-                        }
-                        .absolve
-                    case ResourceResponse(name, request, contentType, status, headers) =>
-                      UzResponse
-                        .fromResource(
-                          name = name,
-                          request = request,
-                          contentType = contentType,
-                          status = status,
-                          headers = headers
-                        )
-                        .either
-                        .map {
-                          case Right(response) => Right(response)
-                          case Left(error) =>
-                            error match {
-                              case e: HTTPError.NotFound => Left(e)
-                              case e                     => Right(handleServerError(e))
-                            }
-                        }
-                        .absolve
+              implementation(a).either.flatMap {
+                case Right(b) =>
+                  response(b).mapError {
+                    case error: HTTPError => error
+                    case throwable        => HTTPError.InternalServerError(throwable.getMessage, Some(throwable))
                   }
-                )
-
+                case Left(throwable) =>
+                  handleServerError(throwable).mapError {
+                    case error: HTTPError => error
+                    case throwable        => HTTPError.InternalServerError(throwable.getMessage, Some(throwable))
+                  }
+              }
             case invalid: Invalid =>
-              ZIO.succeed(handleClientErrors(invalid))
+              handleClientErrors(invalid).mapError {
+                case error: HTTPError => error
+                case throwable        => HTTPError.InternalServerError(throwable.getMessage, Some(throwable))
+              }
           })
         }
 
@@ -81,12 +69,8 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
    *
    * This method can be overridden to customize the error reporting logic.
    */
-  def handleClientErrors(invalid: Invalid): UzResponse =
-    clientErrorsResponse(invalidToClientErrors(invalid)) match {
-      case IdResponse(response) => response
-      case _ =>
-        UzResponse.const(Array.empty, InternalServerError)
-    }
+  def handleClientErrors(invalid: Invalid): RIO[Blocking, UzResponse] =
+    clientErrorsResponse(invalidToClientErrors(invalid))
 
   /**
    * This method is called by ''endpoints'' when an exception is thrown during
@@ -97,11 +81,6 @@ trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with R
    *
    * This method can be overridden to customize the error reporting logic.
    */
-  def handleServerError(throwable: Throwable): UzResponse =
-    serverErrorResponse(throwableToServerError(throwable)) match {
-      case IdResponse(response) =>
-        response
-      case _ =>
-        UzResponse.const(Array.empty, InternalServerError)
-    }
+  def handleServerError(throwable: Throwable): RIO[Blocking, UzResponse] =
+    serverErrorResponse(throwableToServerError(throwable))
 }

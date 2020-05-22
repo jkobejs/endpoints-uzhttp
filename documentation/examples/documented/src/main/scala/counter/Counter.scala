@@ -13,6 +13,8 @@ object Operation {
 //#domain-model
 
 //#endpoint-description
+import counter.CounterLayer.CounterService
+import endpoints.algebra.BasicAuthentication.Credentials
 import endpoints.{ algebra, generic }
 
 trait CounterEndpoints
@@ -69,42 +71,71 @@ object CounterDocumentation
 }
 //#endpoint-documentation
 
+//#counter-service
+import zio.console.Console
+import zio._
+
+object CounterLayer {
+  type CounterService = Has[CounterService.Service]
+  object CounterService {
+    trait Service {
+      def current: UIO[Int]
+      def set(value: Int): UIO[Int]
+      def add(value: Int): UIO[Int]
+    }
+
+    val live: ZLayer[Console, Nothing, Has[Service]] = ZLayer.fromFunctionM { console: Console =>
+      ZRef.make(0).map { ref =>
+        new Service {
+          override def current: UIO[Int] =
+            console.get.putStrLn("Getting current value") *>
+              ref.get
+
+          override def set(value: Int): UIO[Int] =
+            console.get.putStrLn(s"Setting $value") *>
+              ref.set(value).map(_ => value)
+
+          override def add(value: Int): UIO[Int] =
+            console.get.putStrLn(s"Adding $value") *>
+              ref.updateAndGet(_ + value)
+        }
+      }
+    }
+
+    def current: URIO[CounterService, Int]         = URIO.accessM(_.get.current)
+    def set(value: Int): URIO[CounterService, Int] = URIO.accessM(_.get.set(value))
+    def add(value: Int): URIO[CounterService, Int] = URIO.accessM(_.get.add(value))
+  }
+
+  val liveEnv: ZLayer[Any, Nothing, Has[CounterService.Service]] = Console.live >>> CounterService.live
+}
+//#counter-service
+
 //#endpoint-implementation
-import java.util.concurrent.atomic.AtomicInteger
 import endpoints.uzhttp.server._
 import zio.ZIO
 
 object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentication with JsonEntitiesFromSchemas {
   parent =>
 
-  private val value = new AtomicInteger(0)
-
-  val username = "username"
-  val password = "password"
-
   val handlers = (
     currentValue.interpret { credentials =>
-      ZIO
-        .environment[zio.console.Console]
-        .flatMap(console =>
-          if (credentials.username == username && credentials.password == password)
-            ZIO(Some(Counter(value.get())))
-          else
-            console.get.putStr(s"Invalid credentials $credentials").map(_ => None)
-        )
+      if (login(credentials))
+        CounterService.current.map(value => Some(Counter(value)))
+      else
+        UIO.none
     } orElse
-      update.interpretPure {
-        case (Operation.Set(newValue), credentials)
-            if (credentials.username == username && credentials.password == password) =>
-          value.set(newValue)
-          Some(Counter(newValue))
-        case (Operation.Add(delta), credentials)
-            if (credentials.username == username && credentials.password == password) =>
-          val newValue = value.addAndGet(delta)
-          Some(Counter(newValue))
-        case _ => None
+      update.interpret {
+        case (Operation.Set(newValue), credentials) if login(credentials) =>
+          CounterService.set(newValue).map(value => Some(Counter(value)))
+        case (Operation.Add(delta), credentials) if login(credentials) =>
+          CounterService.add(delta).map(value => Some(Counter(value)))
+        case _ => UIO.none
       }
   )
+
+  private def login(credentials: Credentials): Boolean =
+    credentials.username == "username" && credentials.password == "password"
 }
 //#endpoint-implementation
 
@@ -130,6 +161,7 @@ object DocumentationServer extends Endpoints with JsonEntitiesFromEncodersAndDec
 
 //#main
 import java.net.InetSocketAddress
+
 import uzhttp.server.Server
 import zio.App
 
@@ -141,6 +173,7 @@ object Main extends App {
         CounterServer.handlers orElse DocumentationServer.handlers
       )
       .serve
+      .provideCustomLayer(CounterLayer.liveEnv)
       .useForever
       .orDie
 }
