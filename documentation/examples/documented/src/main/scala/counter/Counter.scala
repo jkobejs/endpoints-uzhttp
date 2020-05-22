@@ -72,7 +72,7 @@ object CounterDocumentation
 //#endpoint-implementation
 import java.util.concurrent.atomic.AtomicInteger
 import endpoints.uzhttp.server._
-import zio.ZIO
+import zio.Task
 
 object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentication with JsonEntitiesFromSchemas {
   parent =>
@@ -84,14 +84,10 @@ object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentic
 
   val handlers = (
     currentValue.interpret { credentials =>
-      ZIO
-        .environment[zio.console.Console]
-        .flatMap(console =>
-          if (credentials.username == username && credentials.password == password)
-            ZIO(Some(Counter(value.get())))
-          else
-            console.get.putStr(s"Invalid credentials $credentials").map(_ => None)
-        )
+      if (credentials.username == username && credentials.password == password)
+        Task.some(Counter(value.get()))
+      else
+        Task.none
     } orElse
       update.interpretPure {
         case (Operation.Set(newValue), credentials)
@@ -131,7 +127,7 @@ object DocumentationServer extends Endpoints with JsonEntitiesFromEncodersAndDec
 //#main
 import java.net.InetSocketAddress
 import uzhttp.server.Server
-import zio.App
+import zio.{ App, ZIO }
 
 object Main extends App {
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =

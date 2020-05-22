@@ -1,10 +1,10 @@
 package sample
 
-import endpoints.uzhttp.server.{ BasicAuthentication, Endpoints, JsonEntitiesFromCodecs }
-import sample.algebra.{ DocumentedApi, Item }
+import endpoints.uzhttp.server.{BasicAuthentication, Endpoints, JsonEntitiesFromCodecs}
+import sample.algebra.{DocumentedApi, Item}
 import uzhttp.HTTPError
 import zio.blocking.Blocking
-import zio.{ UIO, ZIO }
+import zio.{Task, ZIO}
 
 object Api extends Endpoints with JsonEntitiesFromCodecs with BasicAuthentication with DocumentedApi {
   //#implementation
@@ -13,6 +13,6 @@ object Api extends Endpoints with JsonEntitiesFromCodecs with BasicAuthenticatio
       case (category, page) =>
         List(Item(s"first item from category $category and page $page"))
     } orElse
-      item.interpret(id => UIO.some(Item(id.toString)))
+      item.interpret(id => Task.some(Item(id.toString)))
   //#implementation
 }

@@ -3,9 +3,10 @@ package endpoints.uzhttp.server
 import java.nio.file.Paths
 
 import endpoints.algebra.Documentation
-import endpoints.{ algebra, Valid }
-import uzhttp.{ Request => UzRequest }
-import zio.UIO
+import endpoints.{Valid, algebra}
+import uzhttp.{Request => UzRequest, Response => UzResponse}
+import zio.blocking.Blocking
+import zio.{RIO, Task, UIO}
 
 trait Assets extends algebra.Assets with Endpoints {
 
@@ -13,7 +14,7 @@ trait Assets extends algebra.Assets with Endpoints {
 
   case class AssetPath(path: Seq[String], name: String)
 
-  type AssetResponse = HttpResponse
+  type AssetResponse = RIO[Blocking, UzResponse]
 
   def assetSegments(name: String, docs: Documentation): Path[AssetPath] =
     new Path[AssetPath] {
@@ -72,20 +73,21 @@ trait Assets extends algebra.Assets with Endpoints {
       }
 
     if (serveFromFilesystem)
-      PathResponse(
-        Paths.get(resourcePath),
-        assetRequest.request,
-        contentType = contentType.toString,
-        headers = headers
-      )
+      UzResponse
+        .fromPath(
+          Paths.get(resourcePath),
+          assetRequest.request,
+          contentType = contentType.toString,
+          headers = headers
+        )
     else
-      ResourceResponse(
-        resourcePath,
-        assetRequest.request,
-        contentType = contentType.toString,
-        headers = headers
-      )
-
+      UzResponse
+        .fromResource(
+          resourcePath,
+          assetRequest.request,
+          contentType = contentType.toString,
+          headers = headers
+        )
   }
 
   private def nameToContentType(name: String): `Content-Type` =

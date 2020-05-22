@@ -6,40 +6,18 @@ import java.nio.file.Path
 import _root_.uzhttp.{ Status, Request => UzRequest, Response => UzResponse }
 import endpoints._
 import endpoints.algebra.Documentation
+import zio.blocking.Blocking
+import zio.{ RIO, Task }
 
 trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
 
-  sealed trait HttpResponse
-  final case class PathResponse(
-    path: Path,
-    request: UzRequest,
-    contentType: String,
-    status: Status = Status.Ok,
-    headers: List[(String, String)] = Nil
-  ) extends HttpResponse
-  final case class ResourceResponse(
-    name: String,
-    request: UzRequest,
-    contentType: String,
-    status: Status = Status.Ok,
-    headers: List[(String, String)] = Nil
-  ) extends HttpResponse
-
-  final case class IdResponse(response: UzResponse) extends HttpResponse
-
   /** An HTTP response (status, headers, and entity) carrying an information of type A
-   *
-   * It is modeled as function that receives `A` and return [[HttpResponse]].
-   * [[HttpResponse]] is sealed trait that has 3 subtypes:
-   *  - [[PathResponse]] - it should be used for returning assets form path on server
-   *  - [[ResourceResponse]] - it should be used for returning assets from resources
-   *  - [[IdResponse]] - it should be used for returning regular responses
    *
    * @note This type has implicit methods provided by the [[InvariantFunctorSyntax]]
    *       and [[ResponseSyntax]] class
    * @group types
    */
-  type Response[A] = A => HttpResponse
+  type Response[A] = A => RIO[Blocking, UzResponse]
 
   implicit lazy val responseInvariantFunctor: endpoints.InvariantFunctor[Response] =
     new endpoints.InvariantFunctor[Response] {
@@ -178,7 +156,7 @@ trait Responses extends algebra.Responses with algebra.Errors with StatusCodes {
     r => {
       val (a, b)              = tupler.unapply(r)
       val (body, contentType) = entity(a)
-      IdResponse(
+      Task(
         UzResponse.const(
           body = body,
           status = statusCode,
