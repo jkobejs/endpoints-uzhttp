@@ -9,6 +9,19 @@ trait Endpoints extends algebra.Endpoints with EndpointsWithCustomErrors with Bu
 
 trait EndpointsWithCustomErrors extends algebra.EndpointsWithCustomErrors with Requests with Responses {
   case class Endpoint[A, B](request: Request[A], response: Response[B]) {
+
+    /**
+     * Interprets endpoint into partial function that receives [[uzhttp.Request]] and returns
+     * effect that contains [[uzhttp.Response]], can fail with [[uzhttp.HTTPError]] and requires
+     * custom environment `R` together with [[Blocking]].
+     *
+     * Effect cannot require only `R` because for interpreting asset endpoints we need to make calls
+     * to file system which requires blocking thread pool.
+     *
+     * @param implementation endpoint implementation
+     * @tparam R environment that returning effect requires
+     * @return partial function that models request, response flow
+     */
     def interpret[R](
       implementation: A => RIO[R, B]
     ): PartialFunction[UzRequest, ZIO[R with Blocking, HTTPError, UzResponse]] = {

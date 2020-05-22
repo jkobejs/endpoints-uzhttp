@@ -21,7 +21,7 @@ You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp™.
 
 The `Endpoints` interpreter provides 
 @scaladoc[intepret](endpoints.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
-and @scaladoc[interpretaPure](endpoints.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
+and @scaladoc[interpretPure](endpoints.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
 methods that can be chained using `orElse` method and integrated to your uzhttp server.
 
 For instance, given the following endpoint definition:

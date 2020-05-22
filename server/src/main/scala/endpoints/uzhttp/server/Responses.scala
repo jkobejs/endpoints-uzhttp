@@ -1,9 +1,8 @@
 package endpoints.uzhttp.server
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
 
-import _root_.uzhttp.{ Status, Request => UzRequest, Response => UzResponse }
+import _root_.uzhttp.{ Response => UzResponse }
 import endpoints._
 import endpoints.algebra.Documentation
 import zio.blocking.Blocking
