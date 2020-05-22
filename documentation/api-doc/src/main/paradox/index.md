@@ -7,7 +7,7 @@ endpoints-uzhttp
 
 [Endpoints](https://github.com/julienrf/endpoints) server interpreter backed by [uzhttp](https://github.com/polynote/uzhttp).
 
-You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp™.
+You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp.
 ## Server
 @@@vars
 ~~~ scala

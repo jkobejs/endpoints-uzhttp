@@ -2,7 +2,7 @@
 
 [Endpoints](https://github.com/julienrf/endpoints) server interpreter backed by [uzhttp](https://github.com/polynote/uzhttp).
 
-You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp™.
+You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp.
 
 See the [documentation](https://jkobejs.github.io/endpoints-uzhttp) to learn more.
 
