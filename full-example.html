@@ -144,7 +144,7 @@ jkobejs/endpoints-uzhttp
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.2.0
+<i class="md-icon" title="Version">label_outline</i> 0.2.0+1-1f7a38d9*
 </label>
 </li>
 </ul>
@@ -156,7 +156,7 @@ jkobejs/endpoints-uzhttp
 <div class="md-content__searchable">
 <h1><a href="#full-example" name="full-example" class="anchor"><span class="anchor-link"></span></a>full-example</h1>
 <p>Let&rsquo;s start with defining our domain model.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L4-L12" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Our domain model just contains a counter value
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L4-L12" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Our domain model just contains a counter value
 case class Counter(value: Int)
 
 // The operations that we can apply to our counter
@@ -166,7 +166,7 @@ object Operation {
   case class Add(delta: Int) extends Operation
 }</code></pre>
 <p>After we have our domain defined let&rsquo;s describe HTTP API that we will use.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L16-L54" target="_blank" title="Go to snippet source"></a><code class="language-scala">import counter.CounterLayer.CounterService
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L16-L54" target="_blank" title="Go to snippet source"></a><code class="language-scala">import counter.CounterLayer.CounterService
 import endpoints.algebra.BasicAuthentication.Credentials
 import endpoints.{ algebra, generic }
 
@@ -206,7 +206,7 @@ trait CounterEndpoints
     genericJsonSchema
 }</code></pre>
 <p>We want to show our HTTP API documentation in Swagger UI so let&rsquo;s define OpenAPI documentation.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L58-L71" target="_blank" title="Go to snippet source"></a><code class="language-scala">import endpoints.openapi
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L58-L71" target="_blank" title="Go to snippet source"></a><code class="language-scala">import endpoints.openapi
 import endpoints.openapi.model.{ Info, OpenApi }
 
 object CounterDocumentation
@@ -221,7 +221,7 @@ object CounterDocumentation
     )(currentValue, update)
 }</code></pre>
 <p>Since we want to store our counter, retrieve it and increment it lets define service that will do that.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L75-L111" target="_blank" title="Go to snippet source"></a><code class="language-scala">import zio.console.Console
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L75-L111" target="_blank" title="Go to snippet source"></a><code class="language-scala">import zio.console.Console
 import zio._
 
 object CounterLayer {
@@ -259,7 +259,7 @@ object CounterLayer {
   val liveEnv: ZLayer[Any, Nothing, Has[CounterService.Service]] = Console.live &gt;&gt;&gt; CounterService.live
 }</code></pre>
 <p>If we want to bring out HTTP API descriptions to life we need to interpret them, so lets do that.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L115-L139" target="_blank" title="Go to snippet source"></a><code class="language-scala">import endpoints.uzhttp.server._
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L115-L139" target="_blank" title="Go to snippet source"></a><code class="language-scala">import endpoints.uzhttp.server._
 import zio.ZIO
 
 object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentication with JsonEntitiesFromSchemas {
@@ -285,7 +285,7 @@ object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentic
     credentials.username == &quot;username&quot; &amp;&amp; credentials.password == &quot;password&quot;
 }</code></pre>
 <p>We also need to interpret documentation endpoints, we will do that by using <code>uzhttp</code> implementation of <code>Assets</code> algebra.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L143-L159" target="_blank" title="Go to snippet source"></a><code class="language-scala">object DocumentationServer extends Endpoints with JsonEntitiesFromEncodersAndDecoders with Assets {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L143-L159" target="_blank" title="Go to snippet source"></a><code class="language-scala">object DocumentationServer extends Endpoints with JsonEntitiesFromEncodersAndDecoders with Assets {
 
   // HTTP endpoint serving documentation. Uses the HTTP verb &#39;&#39;GET&#39;&#39; and the path
   // &#39;&#39;/documentation.json&#39;&#39;. Returns an OpenAPI document.
@@ -303,7 +303,7 @@ object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentic
   override def digests: Map[String, String] = Map.empty
 }</code></pre>
 <p>All that is left is to serve our HTTP API is to run uzhttp server and provide layer with Counter&rsquo;s live environment, so let&rsquo;s to that.</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/examples/documented/src/main/scala/counter/Counter.scala#L163-L179" target="_blank" title="Go to snippet source"></a><code class="language-scala">import java.net.InetSocketAddress
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/examples/documented/src/main/scala/counter/Counter.scala#L163-L179" target="_blank" title="Go to snippet source"></a><code class="language-scala">import java.net.InetSocketAddress
 
 import uzhttp.server.Server
 import zio.App
@@ -322,13 +322,13 @@ object Main extends App {
 }</code></pre>
 </div>
 <div>
-<a href="https://github.com/jkobejs/endpoints-uzhttp/tree/v0.2.0/documentation/api-doc/src/main/paradox/full-example.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/jkobejs/endpoints-uzhttp/tree/master/documentation/api-doc/src/main/paradox/full-example.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.2.0
+0.2.0+1-1f7a38d9*
 </span>
 </div>
 </article>
