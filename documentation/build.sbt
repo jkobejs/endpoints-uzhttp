@@ -34,8 +34,8 @@ val `example-documented` =
       `scala 2.12 to latest`,
       publishArtifact := false,
       libraryDependencies ++= Seq(
-        "org.julienrf" %% "endpoints-algebra"             % endpointsVersion,
-        "org.julienrf" %% "endpoints-json-schema-generic" % endpointsVersion
+        "org.endpoints4s" %% "algebra"             % endpointsVersion,
+        "org.endpoints4s" %% "json-schema-generic" % endpointsVersion
       )
     )
     .dependsOn(`uzhttp-server`)
@@ -48,9 +48,9 @@ val `example-basic-shared` =
       noPublishSettings,
       `scala 2.12 to latest`,
       libraryDependencies ++= Seq(
-        "io.circe"     %% "circe-generic"           % circeVersion,
-        "org.julienrf" %% "endpoints-algebra"       % endpointsVersion,
-        "org.julienrf" %% "endpoints-algebra-circe" % endpointsVersion
+        "io.circe"        %% "circe-generic" % circeVersion,
+        "org.endpoints4s" %% "algebra"       % endpointsVersion,
+        "org.endpoints4s" %% "algebra-circe" % endpointsVersion
       ),
       macroParadiseDependency
     )

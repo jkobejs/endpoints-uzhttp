@@ -1,6 +1,6 @@
 package sample
 
-import endpoints.uzhttp.server.{ BasicAuthentication, Endpoints, JsonEntitiesFromCodecs }
+import endpoints4s.uzhttp.server.{ BasicAuthentication, Endpoints, JsonEntitiesFromCodecs }
 import sample.algebra.{ DocumentedApi, Item }
 import uzhttp.HTTPError
 import zio.blocking.Blocking
