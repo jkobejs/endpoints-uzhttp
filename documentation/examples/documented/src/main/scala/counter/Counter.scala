@@ -14,8 +14,8 @@ object Operation {
 
 //#endpoint-description
 import counter.CounterLayer.CounterService
-import endpoints.algebra.BasicAuthentication.Credentials
-import endpoints.{ algebra, generic }
+import endpoints4s.algebra.BasicAuthentication.Credentials
+import endpoints4s.{ algebra, generic }
 
 trait CounterEndpoints
     extends algebra.EndpointsWithCustomErrors
@@ -44,7 +44,7 @@ trait CounterEndpoints
   // We generically derive a data type schema. This schema
   // describes that the case class `Counter` has one field
   // of type `Int` named “value”
-  implicit lazy val jsonSchemaCounter: JsonSchema[Counter] = genericJsonSchema
+  implicit lazy val jsonSchemaCounter: JsonSchema[Counter]     = genericJsonSchema
   // Again, we generically derive a schema for the `Operation`
   // data type. This schema describes that `Operation` can be
   // either `Set` or `Add`, and that `Set` has one `Int` field
@@ -55,8 +55,8 @@ trait CounterEndpoints
 //#endpoint-description
 
 //#endpoint-documentation
-import endpoints.openapi
-import endpoints.openapi.model.{ Info, OpenApi }
+import endpoints4s.openapi
+import endpoints4s.openapi.model.{ Info, OpenApi }
 
 object CounterDocumentation
     extends CounterEndpoints
@@ -72,8 +72,8 @@ object CounterDocumentation
 //#endpoint-documentation
 
 //#counter-service
-import zio.console.Console
 import zio._
+import zio.console.Console
 
 object CounterLayer {
   type CounterService = Has[CounterService.Service]
@@ -112,7 +112,7 @@ object CounterLayer {
 //#counter-service
 
 //#endpoint-implementation
-import endpoints.uzhttp.server._
+import endpoints4s.uzhttp.server._
 import zio.ZIO
 
 object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentication with JsonEntitiesFromSchemas {
@@ -128,9 +128,9 @@ object CounterServer extends CounterEndpoints with Endpoints with BasicAuthentic
       update.interpret {
         case (Operation.Set(newValue), credentials) if login(credentials) =>
           CounterService.set(newValue).map(value => Some(Counter(value)))
-        case (Operation.Add(delta), credentials) if login(credentials) =>
+        case (Operation.Add(delta), credentials) if login(credentials)    =>
           CounterService.add(delta).map(value => Some(Counter(value)))
-        case _ => UIO.none
+        case _                                                            => UIO.none
       }
   )
 
@@ -166,7 +166,7 @@ import uzhttp.server.Server
 import zio.App
 
 object Main extends App {
-  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
+  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, ExitCode] =
     Server
       .builder(new InetSocketAddress("127.0.0.1", 8080))
       .handleSome(
@@ -176,5 +176,6 @@ object Main extends App {
       .provideCustomLayer(CounterLayer.liveEnv)
       .useForever
       .orDie
+      .exitCode
 }
 //#main

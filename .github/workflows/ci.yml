@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scala: [2.12.10, 2.13.1]
+        scala: [2.12.12, 2.13.3]
     steps:
       - uses: actions/checkout@v2
       - run: git fetch --prune --unshallow
@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: adopt@1.8
       - name: Format Check
-        if: matrix.scala == '2.13.1'
+        if: matrix.scala == '2.13.3'
         run: sbt ++${{matrix.scala}} fmtCheck
       - name: test
         run: sbt ++${{matrix.scala}} test

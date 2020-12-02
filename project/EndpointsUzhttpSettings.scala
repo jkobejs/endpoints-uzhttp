@@ -17,7 +17,7 @@ object EndpointsUzhttpSettings {
     ) ++
       (CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, n)) if n >= 13 => Seq("-Xsource:2.14")
-        case _ =>
+        case _                       =>
           Seq(
             "-Yno-adapted-args",
             "-Ywarn-unused-import",
@@ -30,23 +30,23 @@ object EndpointsUzhttpSettings {
   )
 
   val `scala 2.12 to latest` = Seq(
-    scalaVersion := "2.13.1",
-    crossScalaVersions := Seq("2.13.1", "2.12.10")
+    scalaVersion := "2.13.3",
+    crossScalaVersions := Seq("2.13.3", "2.12.12")
   )
 
   val noPublishSettings = commonSettings ++ Seq(
     publishArtifact := false,
-    publish := { () },
-    publishLocal := { () }
+    publish := (),
+    publishLocal := ()
   )
 
   // --- Common dependencies
   val circeVersion     = "0.13.0"
-  val endpointsVersion = "0.15.0+46-37dde73f"
-  val akkaHttpVersion  = "10.1.12"
-  val akkaActorVersion = "2.6.5"
+  val endpointsVersion = "1.1.0"
+  val akkaHttpVersion  = "10.2.1"
+  val akkaActorVersion = "2.6.9"
   val scalaTestVersion = "3.1.2"
-  val uzhttpVersion    = "0.2.2"
+  val uzhttpVersion    = "0.2.5"
   val ujsonVersion     = "1.1.0"
 
   val macroParadiseDependency = Seq(
@@ -59,7 +59,7 @@ object EndpointsUzhttpSettings {
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, n)) if n >= 13 => Nil
-        case _ =>
+        case _                       =>
           compilerPlugin(
             "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
           ) :: Nil
