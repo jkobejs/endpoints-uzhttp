@@ -15,13 +15,13 @@ You Probably Shouldn't Use It Because You Probably Shouldn't Use uzhttp.
 ~~~
 @@@
 
-@scaladoc[API documentation](endpoints.uzhttp.server.index)
+@scaladoc[API documentation](endpoints4s.uzhttp.server.index)
 
 ### `Endpoints`
 
 The `Endpoints` interpreter provides 
-@scaladoc[intepret](endpoints.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
-and @scaladoc[interpretPure](endpoints.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
+@scaladoc[intepret](endpoints4s.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
+and @scaladoc[interpretPure](endpoints4s.uzhttp.server.EndpointsWithCustomErrors$Endpoint)
 methods that can be chained using `orElse` method and integrated to your uzhttp server.
 
 For instance, given the following endpoint definition:
@@ -55,12 +55,12 @@ uzhttp server will return 404 error.
 
 In that case, *endpoints* returns a “Bad Request” (400) response reporting all the errors in a
 JSON array. You can change this behavior by overriding the
-@scaladoc[handleClientErrors](endpoints.uzhttp.server.EndpointsWithCustomErrors) method.
+@scaladoc[handleClientErrors](endpoints4s.uzhttp.server.EndpointsWithCustomErrors) method.
 
 #### An exception is thrown
 
 If an exception is thrown during request decoding, or when running the business logic, or when
 encoding the response, *endpoints* returns an “Internal Server Error” (500) response reporting
 the error in a JSON array. You can change this behavior by overriding the
-@scaladoc[handleServerError](endpoints.uzhttp.server.EndpointsWithCustomErrors) method.
+@scaladoc[handleServerError](endpoints4s.uzhttp.server.EndpointsWithCustomErrors) method.
 
