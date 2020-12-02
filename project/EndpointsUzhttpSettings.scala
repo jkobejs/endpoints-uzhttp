@@ -46,7 +46,7 @@ object EndpointsUzhttpSettings {
   val akkaHttpVersion  = "10.2.1"
   val akkaActorVersion = "2.6.9"
   val scalaTestVersion = "3.1.2"
-  val uzhttpVersion    = "0.2.5"
+  val uzhttpVersion    = "0.2.6"
   val ujsonVersion     = "1.1.0"
 
   val macroParadiseDependency = Seq(
