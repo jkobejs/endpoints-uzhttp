@@ -43,7 +43,7 @@ object EndpointsUzhttpSettings {
   // --- Common dependencies
   val circeVersion     = "0.13.0"
   val endpointsVersion = "1.1.0"
-  val akkaHttpVersion  = "10.2.1"
+  val akkaHttpVersion  = "10.2.4"
   val akkaActorVersion = "2.6.9"
   val scalaTestVersion = "3.1.2"
   val uzhttpVersion    = "0.2.5"
