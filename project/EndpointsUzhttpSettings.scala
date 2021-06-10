@@ -44,7 +44,7 @@ object EndpointsUzhttpSettings {
   val circeVersion     = "0.13.0"
   val endpointsVersion = "1.1.0"
   val akkaHttpVersion  = "10.2.1"
-  val akkaActorVersion = "2.6.9"
+  val akkaActorVersion = "2.6.15"
   val scalaTestVersion = "3.1.2"
   val uzhttpVersion    = "0.2.5"
   val ujsonVersion     = "1.1.0"
